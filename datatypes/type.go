@@ -43,8 +43,43 @@ func GetType(name string, d gjson.Result) *Type {
 				switch t.TypeName {
 				case "container":
 					t.Extras = &Container{}
-
 					t.Extras.(*Container).ReadJSON(arr[1])
+				case "switch":
+					t.Extras = &SwitchType{}
+					t.Extras.(*SwitchType).ReadJSON(arr[1])
+				case "option":
+					t.Extras = &OptionType{}
+					t.Extras.(*OptionType).ReadJSON(arr[1])
+				case "array":
+					t.Extras = &ArrayType{}
+					t.Extras.(*ArrayType).ReadJSON(arr[1])
+				case "buffer":
+					t.Extras = &BufferType{}
+					t.Extras.(*BufferType).ReadJSON(arr[1])
+				case "bitfield":
+					t.Extras = &BitField{}
+					t.Extras.(*BitField).ReadJSON(arr[1])
+				case "pstring":
+					t.Extras = &PStringType{}
+					t.Extras.(*PStringType).ReadJSON(arr[1])
+				case "int":
+					// Generic integer with configurable size: ["int", {"size": N}]
+					if arr[1].IsObject() && arr[1].Get("size").Exists() {
+						size := int(arr[1].Get("size").Int())
+						t.Extras = size
+					}
+				case "count":
+					t.Extras = &CountType{}
+					t.Extras.(*CountType).ReadJSON(arr[1])
+				case "mapper":
+					t.Extras = &MapperType{}
+					t.Extras.(*MapperType).ReadJSON(arr[1])
+				case "lint":
+					// Little-endian integer with configurable size: ["lint", {"size": N}]
+					if arr[1].IsObject() && arr[1].Get("size").Exists() {
+						size := int(arr[1].Get("size").Int())
+						t.Extras = size
+					}
 				}
 			}
 		}
