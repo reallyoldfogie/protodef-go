@@ -86,6 +86,7 @@ packetType := proto.GetType("handshake_packet")
 - [Implementation Fixes Plan](docs/implementation-fixes.md) - Detailed implementation roadmap
 - [Phase Summaries](docs/) - Phase 1-3 implementation summaries
 - [Extensions Guide](docs/extensions.md) - Non-standard type extensions
+- [RawDefinition Feature](docs/rawdefinition.md) - Debugging with original type definitions
 
 ### ProtoDef Specification
 - [Official Spec](ProtoDef/README.md)
@@ -103,6 +104,7 @@ packetType := proto.GetType("handshake_packet")
 - Anonymous container fields
 - Configurable integer sizes
 - Value mapping (mapper type)
+- RawDefinition preservation for debugging
 
 ### 🔜 Planned
 - Runtime serialization/deserialization

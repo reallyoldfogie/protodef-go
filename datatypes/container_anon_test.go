@@ -138,7 +138,7 @@ func TestGetTypeContainer(t *testing.T) {
 	]]`
 
 	result := gjson.Parse(jsonStr)
-	typ := GetType("test_container", result)
+	typ := GetType(result)
 
 	if typ == nil {
 		t.Fatal("GetType() returned nil")

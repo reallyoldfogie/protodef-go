@@ -4,7 +4,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-// MapperType represents a ProtoDef 'mapper' utility type.
+// Mapper represents a ProtoDef 'mapper' utility type.
 // Maps string keys to values.
 // Arguments:
 //   - type: the type of the input
@@ -23,12 +23,13 @@ import (
 //	}]
 //
 // Example of value: "int"
-type MapperType struct {
+type Mapper struct {
+	name     string
 	Type     *Type
 	Mappings map[string]any
 }
 
-func (m *MapperType) ReadJSON(d gjson.Result) error {
+func (m *Mapper) ReadJSON(d gjson.Result) error {
 	if !d.IsObject() {
 		return nil
 	}
@@ -51,4 +52,36 @@ func (m *MapperType) ReadJSON(d gjson.Result) error {
 	}
 
 	return nil
+}
+
+func (m *Mapper) SetName(name string) {
+	m.name = name
+}
+
+func (m *Mapper) GetName() string {
+	return m.name
+}
+
+func (m *Mapper) Clone() TypeExtras {
+	cloned := &Mapper{
+		name:     m.name,
+		Mappings: make(map[string]any, len(m.Mappings)),
+	}
+	for key, val := range m.Mappings {
+		cloned.Mappings[key] = val
+	}
+	if m.Type != nil {
+		clonedType := *m.Type
+		if m.Type.Extras != nil {
+			clonedType.Extras = m.Type.Extras.Clone()
+		}
+		cloned.Type = &clonedType
+	}
+	return cloned
+}
+
+func (m *Mapper) UpdateContainedNames(updatedNames map[string]string) {
+	if m.Type != nil && m.Type.Extras != nil {
+		m.Type.Extras.UpdateContainedNames(updatedNames)
+	}
 }

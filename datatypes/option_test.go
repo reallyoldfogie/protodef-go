@@ -9,7 +9,7 @@ import (
 func TestOptionTypeReadJSON(t *testing.T) {
 	jsonStr := `"i32"`
 
-	option := &OptionType{}
+	option := &Option{}
 	result := gjson.Parse(jsonStr)
 	err := option.ReadJSON(result)
 
@@ -29,7 +29,7 @@ func TestOptionTypeReadJSON(t *testing.T) {
 func TestOptionTypeReadJSONComplexType(t *testing.T) {
 	jsonStr := `"varint"`
 
-	option := &OptionType{}
+	option := &Option{}
 	result := gjson.Parse(jsonStr)
 	err := option.ReadJSON(result)
 
@@ -49,7 +49,7 @@ func TestOptionTypeReadJSONComplexType(t *testing.T) {
 func TestOptionTypeReadJSONWithArray(t *testing.T) {
 	jsonStr := `["array", {"type": "u8", "count": 10}]`
 
-	option := &OptionType{}
+	option := &Option{}
 	result := gjson.Parse(jsonStr)
 	err := option.ReadJSON(result)
 
@@ -70,7 +70,7 @@ func TestGetTypeOption(t *testing.T) {
 	jsonStr := `["option", "i64"]`
 
 	result := gjson.Parse(jsonStr)
-	typ := GetType("test_option", result)
+	typ := GetType(result)
 
 	if typ == nil {
 		t.Fatal("GetType() returned nil")
@@ -80,7 +80,7 @@ func TestGetTypeOption(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "option")
 	}
 
-	option, ok := typ.Extras.(*OptionType)
+	option, ok := typ.Extras.(*Option)
 	if !ok {
 		t.Fatalf("typ.Extras is not *OptionType, got %T", typ.Extras)
 	}
@@ -112,7 +112,7 @@ func TestGetTypeFromJSONOption(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "option")
 	}
 
-	option, ok := typ.Extras.(*OptionType)
+	option, ok := typ.Extras.(*Option)
 	if !ok {
 		t.Fatalf("typ.Extras is not *OptionType")
 	}
@@ -128,7 +128,7 @@ func TestOptionTypeReadJSONNumber(t *testing.T) {
 	// Test that number values are handled properly
 	jsonStr := `123`
 
-	option := &OptionType{}
+	option := &Option{}
 	result := gjson.Parse(jsonStr)
 	err := option.ReadJSON(result)
 
@@ -141,7 +141,7 @@ func TestOptionTypeReadJSONNumber(t *testing.T) {
 func TestOptionTypeReadJSONObject(t *testing.T) {
 	jsonStr := `{"type": "test"}`
 
-	option := &OptionType{}
+	option := &Option{}
 	result := gjson.Parse(jsonStr)
 	err := option.ReadJSON(result)
 

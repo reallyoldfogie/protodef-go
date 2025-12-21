@@ -12,7 +12,7 @@ func TestArrayTypeReadJSON(t *testing.T) {
 		"countType": "i16"
 	}`
 
-	array := &ArrayType{}
+	array := &Array{}
 	result := gjson.Parse(jsonStr)
 	err := array.ReadJSON(result)
 
@@ -39,7 +39,7 @@ func TestArrayTypeReadJSONWithCount(t *testing.T) {
 		"count": 10
 	}`
 
-	array := &ArrayType{}
+	array := &Array{}
 	result := gjson.Parse(jsonStr)
 	err := array.ReadJSON(result)
 
@@ -66,7 +66,7 @@ func TestArrayTypeReadJSONWithVarint(t *testing.T) {
 		"countType": "varint"
 	}`
 
-	array := &ArrayType{}
+	array := &Array{}
 	result := gjson.Parse(jsonStr)
 	err := array.ReadJSON(result)
 
@@ -106,7 +106,7 @@ func TestArrayTypeReadJSONInvalid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			array := &ArrayType{}
+			array := &Array{}
 			result := gjson.Parse(tt.jsonStr)
 			err := array.ReadJSON(result)
 
@@ -125,7 +125,7 @@ func TestArrayTypeReadJSONAllFields(t *testing.T) {
 		"countType": "u32"
 	}`
 
-	array := &ArrayType{}
+	array := &Array{}
 	result := gjson.Parse(jsonStr)
 	err := array.ReadJSON(result)
 
@@ -161,7 +161,7 @@ func TestGetTypeArray(t *testing.T) {
 	}]`
 
 	result := gjson.Parse(jsonStr)
-	typ := GetType("test_array", result)
+	typ := GetType(result)
 
 	if typ == nil {
 		t.Fatal("GetType() returned nil")
@@ -171,7 +171,7 @@ func TestGetTypeArray(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "array")
 	}
 
-	array, ok := typ.Extras.(*ArrayType)
+	array, ok := typ.Extras.(*Array)
 	if !ok {
 		t.Fatalf("typ.Extras is not *ArrayType, got %T", typ.Extras)
 	}
@@ -203,7 +203,7 @@ func TestGetTypeFromJSONArray(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "array")
 	}
 
-	array, ok := typ.Extras.(*ArrayType)
+	array, ok := typ.Extras.(*Array)
 	if !ok {
 		t.Fatalf("typ.Extras is not *ArrayType")
 	}

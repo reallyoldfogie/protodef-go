@@ -12,7 +12,7 @@ func TestCountTypeReadJSON(t *testing.T) {
 		"countFor": "records"
 	}`
 
-	count := &CountType{}
+	count := &Count{}
 	result := gjson.Parse(jsonStr)
 	err := count.ReadJSON(result)
 
@@ -39,7 +39,7 @@ func TestCountTypeReadJSONVarint(t *testing.T) {
 		"countFor": "items"
 	}`
 
-	count := &CountType{}
+	count := &Count{}
 	result := gjson.Parse(jsonStr)
 	err := count.ReadJSON(result)
 
@@ -73,7 +73,7 @@ func TestCountTypeReadJSONInvalid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			count := &CountType{}
+			count := &Count{}
 			result := gjson.Parse(tt.jsonStr)
 			err := count.ReadJSON(result)
 
@@ -92,7 +92,7 @@ func TestGetTypeCount(t *testing.T) {
 	}]`
 
 	result := gjson.Parse(jsonStr)
-	typ := GetType("test_count", result)
+	typ := GetType(result)
 
 	if typ == nil {
 		t.Fatal("GetType() returned nil")
@@ -102,7 +102,7 @@ func TestGetTypeCount(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "count")
 	}
 
-	count, ok := typ.Extras.(*CountType)
+	count, ok := typ.Extras.(*Count)
 	if !ok {
 		t.Fatalf("typ.Extras is not *CountType, got %T", typ.Extras)
 	}
@@ -138,7 +138,7 @@ func TestGetTypeFromJSONCount(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "count")
 	}
 
-	count, ok := typ.Extras.(*CountType)
+	count, ok := typ.Extras.(*Count)
 	if !ok {
 		t.Fatalf("typ.Extras is not *CountType")
 	}

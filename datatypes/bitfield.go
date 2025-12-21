@@ -4,7 +4,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-// BitField represents a ProtoDef 'bitfield' utility type.
+// Bitfield represents a ProtoDef 'bitfield' utility type.
 // Represents a list of values with sizes that are not a multiple of 8 bits.
 // The sum of the sizes must be a multiple of 8.
 // Arguments:
@@ -20,7 +20,8 @@ import (
 //
 // ]]
 // Example of value: {"x": 10, "y": 10, "z": 10}
-type BitField struct {
+type Bitfield struct {
+	name   string
 	Fields []BitFieldField
 }
 
@@ -30,7 +31,7 @@ type BitFieldField struct {
 	Signed bool
 }
 
-func (bf *BitField) ReadJSON(d gjson.Result) error {
+func (bf *Bitfield) ReadJSON(d gjson.Result) error {
 	if !d.IsArray() {
 		return nil
 	}
@@ -43,4 +44,29 @@ func (bf *BitField) ReadJSON(d gjson.Result) error {
 		})
 	}
 	return nil
+}
+
+func (bf *Bitfield) SetName(name string) {
+	bf.name = name
+}
+
+func (bf *Bitfield) GetName() string {
+	return bf.name
+}
+
+func (bf *Bitfield) Clone() TypeExtras {
+	cloned := &Bitfield{
+		name:   bf.name,
+		Fields: make([]BitFieldField, len(bf.Fields)),
+	}
+	copy(cloned.Fields, bf.Fields)
+	return cloned
+}
+
+func (bf *Bitfield) UpdateContainedNames(updatedNames map[string]string) {
+	for i, field := range bf.Fields {
+		if newName, exists := updatedNames[field.Name]; exists {
+			bf.Fields[i].Name = newName
+		}
+	}
 }

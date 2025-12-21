@@ -145,12 +145,12 @@ func TestGenericIntFunction(t *testing.T) {
 			if got.Name != "int" {
 				t.Errorf("GenericInt(%d).Name = %q, want %q", tt.size, got.Name, "int")
 			}
-			if got.TypeName != "int" {
-				t.Errorf("GenericInt(%d).TypeName = %q, want %q", tt.size, got.TypeName, "int")
-			}
-			if gotSize, ok := got.Extras.(int); !ok || gotSize != tt.size {
-				t.Errorf("GenericInt(%d).Extras = %v, want %d", tt.size, got.Extras, tt.size)
-			}
+		if got.TypeName != "int" {
+			t.Errorf("GenericInt(%d).TypeName = %q, want %q", tt.size, got.TypeName, "int")
+		}
+		if ie, ok := got.Extras.(*IntExtras); !ok || ie.Size != tt.size {
+			t.Errorf("GenericInt(%d).Extras = %v, want IntExtras with Size %d", tt.size, got.Extras, tt.size)
+		}
 		})
 	}
 }
@@ -176,12 +176,12 @@ func TestGenericLIntFunction(t *testing.T) {
 			if got.Name != "lint" {
 				t.Errorf("GenericLInt(%d).Name = %q, want %q", tt.size, got.Name, "lint")
 			}
-			if got.TypeName != "lint" {
-				t.Errorf("GenericLInt(%d).TypeName = %q, want %q", tt.size, got.TypeName, "lint")
-			}
-			if gotSize, ok := got.Extras.(int); !ok || gotSize != tt.size {
-				t.Errorf("GenericLInt(%d).Extras = %v, want %d", tt.size, got.Extras, tt.size)
-			}
+		if got.TypeName != "lint" {
+			t.Errorf("GenericLInt(%d).TypeName = %q, want %q", tt.size, got.TypeName, "lint")
+		}
+		if ie, ok := got.Extras.(*IntExtras); !ok || ie.Size != tt.size {
+			t.Errorf("GenericLInt(%d).Extras = %v, want IntExtras with Size %d", tt.size, got.Extras, tt.size)
+		}
 		})
 	}
 }

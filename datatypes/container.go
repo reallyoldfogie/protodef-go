@@ -46,9 +46,59 @@ func (cf *Container) ReadJSON(d gjson.Result) error {
 				typeName = "anon_field"
 			}
 			field.Type = GetTypeFromJSON(typeName, typeData)
+			
+			// DEBUG: Log parsed field
+			typeInfo := "nil"
+			if field.Type != nil {
+				typeInfo = fmt.Sprintf("%s (typename=%s)", field.Type.Name, field.Type.TypeName)
+			}
+			fmt.Printf("DEBUG [container.ReadJSON]: Container '%s' parsed field '%s' Type=%s Anon=%v\n", 
+				cf.Name, field.Name, typeInfo, field.Anon)
 		}
 
-		cf.Fields = append(cf.Fields, field)
+	cf.Fields = append(cf.Fields, field)
 	}
 	return nil
+}
+
+func (cf *Container) SetName(name string) {
+	cf.Name = name
+}
+
+func (cf *Container) GetName() string {
+	return cf.Name
+}
+
+func (cf *Container) Clone() TypeExtras {
+	cloned := &Container{
+		Name:   cf.Name,
+		Fields: make([]*ContainerField, len(cf.Fields)),
+	}
+	for i, field := range cf.Fields {
+		clonedField := &ContainerField{
+			Name: field.Name,
+			Anon: field.Anon,
+		}
+		if field.Type != nil {
+			clonedType := *field.Type
+			if field.Type.Extras != nil {
+				clonedType.Extras = field.Type.Extras.Clone()
+			}
+			// RawDefinition is copied automatically by the struct copy above
+			clonedField.Type = &clonedType
+		}
+		cloned.Fields[i] = clonedField
+	}
+	return cloned
+}
+
+func (cf *Container) UpdateContainedNames(updatedNames map[string]string) {
+	for _, field := range cf.Fields {
+		if newName, exists := updatedNames[field.Name]; exists {
+			field.Name = newName
+		}
+		if field.Type != nil && field.Type.Extras != nil {
+			field.Type.Extras.UpdateContainedNames(updatedNames)
+		}
+	}
 }

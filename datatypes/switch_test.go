@@ -16,7 +16,7 @@ func TestSwitchTypeReadJSON(t *testing.T) {
 		}
 	}`
 
-	sw := &SwitchType{}
+	sw := &Switch{}
 	result := gjson.Parse(jsonStr)
 	err := sw.ReadJSON(result)
 
@@ -65,7 +65,7 @@ func TestSwitchTypeReadJSONWithCompareToValue(t *testing.T) {
 		}
 	}`
 
-	sw := &SwitchType{}
+	sw := &Switch{}
 	result := gjson.Parse(jsonStr)
 	err := sw.ReadJSON(result)
 
@@ -105,7 +105,7 @@ func TestSwitchTypeReadJSONWithDefault(t *testing.T) {
 		"default": "i32"
 	}`
 
-	sw := &SwitchType{}
+	sw := &Switch{}
 	result := gjson.Parse(jsonStr)
 	err := sw.ReadJSON(result)
 
@@ -126,7 +126,7 @@ func TestSwitchTypeReadJSONEmptyFields(t *testing.T) {
 		"fields": {}
 	}`
 
-	sw := &SwitchType{}
+	sw := &Switch{}
 	result := gjson.Parse(jsonStr)
 	err := sw.ReadJSON(result)
 
@@ -159,7 +159,7 @@ func TestSwitchTypeReadJSONAllFields(t *testing.T) {
 		"default": "varint"
 	}`
 
-	sw := &SwitchType{}
+	sw := &Switch{}
 	result := gjson.Parse(jsonStr)
 	err := sw.ReadJSON(result)
 
@@ -204,7 +204,7 @@ func TestSwitchTypeReadJSONInvalid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			sw := &SwitchType{}
+			sw := &Switch{}
 			result := gjson.Parse(tt.jsonStr)
 			err := sw.ReadJSON(result)
 
@@ -226,7 +226,7 @@ func TestGetTypeSwitch(t *testing.T) {
 	}]`
 
 	result := gjson.Parse(jsonStr)
-	typ := GetType("test_switch", result)
+	typ := GetType(result)
 
 	if typ == nil {
 		t.Fatal("GetType() returned nil")
@@ -236,7 +236,7 @@ func TestGetTypeSwitch(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "switch")
 	}
 
-	sw, ok := typ.Extras.(*SwitchType)
+	sw, ok := typ.Extras.(*Switch)
 	if !ok {
 		t.Fatalf("typ.Extras is not *SwitchType, got %T", typ.Extras)
 	}
@@ -275,7 +275,7 @@ func TestGetTypeFromJSONSwitch(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "switch")
 	}
 
-	sw, ok := typ.Extras.(*SwitchType)
+	sw, ok := typ.Extras.(*Switch)
 	if !ok {
 		t.Fatalf("typ.Extras is not *SwitchType")
 	}
@@ -293,7 +293,7 @@ func TestSwitchTypeWithNonStringDefault(t *testing.T) {
 		"default": 123
 	}`
 
-	sw := &SwitchType{}
+	sw := &Switch{}
 	result := gjson.Parse(jsonStr)
 	err := sw.ReadJSON(result)
 

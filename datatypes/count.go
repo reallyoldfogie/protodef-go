@@ -4,7 +4,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-// CountType represents a ProtoDef 'count' structure type.
+// Count represents a ProtoDef 'count' structure type.
 // Represents a count field for an array or a buffer.
 // Arguments:
 //   - type: the type of the count
@@ -15,12 +15,13 @@ import (
 //	["count", {"type": "i16", "countFor": "records"}]
 //
 // Example of value: 4
-type CountType struct {
+type Count struct {
+	name     string
 	Type     *Type
 	CountFor string
 }
 
-func (c *CountType) ReadJSON(d gjson.Result) error {
+func (c *Count) ReadJSON(d gjson.Result) error {
 	if !d.IsObject() {
 		return nil
 	}
@@ -31,4 +32,36 @@ func (c *CountType) ReadJSON(d gjson.Result) error {
 		c.CountFor = d.Get("countFor").String()
 	}
 	return nil
+}
+
+func (c *Count) SetName(name string) {
+	c.name = name
+}
+
+func (c *Count) GetName() string {
+	return c.name
+}
+
+func (c *Count) Clone() TypeExtras {
+	cloned := &Count{
+		name:     c.name,
+		CountFor: c.CountFor,
+	}
+	if c.Type != nil {
+		clonedType := *c.Type
+		if c.Type.Extras != nil {
+			clonedType.Extras = c.Type.Extras.Clone()
+		}
+		cloned.Type = &clonedType
+	}
+	return cloned
+}
+
+func (c *Count) UpdateContainedNames(updatedNames map[string]string) {
+	if newName, exists := updatedNames[c.CountFor]; exists {
+		c.CountFor = newName
+	}
+	if c.Type != nil && c.Type.Extras != nil {
+		c.Type.Extras.UpdateContainedNames(updatedNames)
+	}
 }

@@ -35,6 +35,6 @@ var (
 	ZigZag64  = &Type{Name: "zigzag64", TypeName: "zigzag64"}
 
 	// Generic integer types with configurable size
-	GenericInt  = func(size int) *Type { return &Type{Name: "int", TypeName: "int", Extras: size} }
-	GenericLInt = func(size int) *Type { return &Type{Name: "lint", TypeName: "lint", Extras: size} }
+	GenericInt  = func(size int) *Type { return &Type{Name: "int", TypeName: "int", Extras: &IntExtras{Size: size}} }
+	GenericLInt = func(size int) *Type { return &Type{Name: "lint", TypeName: "lint", Extras: &IntExtras{Size: size}} }
 )

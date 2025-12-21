@@ -13,7 +13,7 @@ func TestBitFieldReadJSON(t *testing.T) {
 		{"name": "z", "size": 26, "signed": true}
 	]`
 
-	bf := &BitField{}
+	bf := &Bitfield{}
 	result := gjson.Parse(jsonStr)
 	err := bf.ReadJSON(result)
 
@@ -65,7 +65,7 @@ func TestBitFieldReadJSONUnsigned(t *testing.T) {
 		{"name": "data", "size": 16, "signed": false}
 	]`
 
-	bf := &BitField{}
+	bf := &Bitfield{}
 	result := gjson.Parse(jsonStr)
 	err := bf.ReadJSON(result)
 
@@ -101,7 +101,7 @@ func TestBitFieldReadJSONUnsigned(t *testing.T) {
 func TestBitFieldReadJSONSingleField(t *testing.T) {
 	jsonStr := `[{"name": "value", "size": 32, "signed": false}]`
 
-	bf := &BitField{}
+	bf := &Bitfield{}
 	result := gjson.Parse(jsonStr)
 	err := bf.ReadJSON(result)
 
@@ -124,7 +124,7 @@ func TestBitFieldReadJSONSingleField(t *testing.T) {
 func TestBitFieldReadJSONEmpty(t *testing.T) {
 	jsonStr := `[]`
 
-	bf := &BitField{}
+	bf := &Bitfield{}
 	result := gjson.Parse(jsonStr)
 	err := bf.ReadJSON(result)
 
@@ -150,7 +150,7 @@ func TestBitFieldReadJSONInvalid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			bf := &BitField{}
+			bf := &Bitfield{}
 			result := gjson.Parse(tt.jsonStr)
 			err := bf.ReadJSON(result)
 
@@ -169,7 +169,7 @@ func TestGetTypeBitField(t *testing.T) {
 	]]`
 
 	result := gjson.Parse(jsonStr)
-	typ := GetType("test_bitfield", result)
+	typ := GetType(result)
 
 	if typ == nil {
 		t.Fatal("GetType() returned nil")
@@ -179,7 +179,7 @@ func TestGetTypeBitField(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "bitfield")
 	}
 
-	bf, ok := typ.Extras.(*BitField)
+	bf, ok := typ.Extras.(*Bitfield)
 	if !ok {
 		t.Fatalf("typ.Extras is not *BitField, got %T", typ.Extras)
 	}
@@ -209,7 +209,7 @@ func TestGetTypeFromJSONBitField(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "bitfield")
 	}
 
-	bf, ok := typ.Extras.(*BitField)
+	bf, ok := typ.Extras.(*Bitfield)
 	if !ok {
 		t.Fatalf("typ.Extras is not *BitField")
 	}

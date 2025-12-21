@@ -11,7 +11,7 @@ func TestPStringTypeReadJSON(t *testing.T) {
 		"countType": "varint"
 	}`
 
-	pstring := &PStringType{}
+	pstring := &PString{}
 	result := gjson.Parse(jsonStr)
 	err := pstring.ReadJSON(result)
 
@@ -33,7 +33,7 @@ func TestPStringTypeReadJSONWithCountInt(t *testing.T) {
 		"count": 32
 	}`
 
-	pstring := &PStringType{}
+	pstring := &PString{}
 	result := gjson.Parse(jsonStr)
 	err := pstring.ReadJSON(result)
 
@@ -60,7 +60,7 @@ func TestPStringTypeReadJSONWithCountField(t *testing.T) {
 		"count": "length_field"
 	}`
 
-	pstring := &PStringType{}
+	pstring := &PString{}
 	result := gjson.Parse(jsonStr)
 	err := pstring.ReadJSON(result)
 
@@ -89,7 +89,7 @@ func TestPStringTypeReadJSONWithEncoding(t *testing.T) {
 		"encoding": "utf-8"
 	}`
 
-	pstring := &PStringType{}
+	pstring := &PString{}
 	result := gjson.Parse(jsonStr)
 	err := pstring.ReadJSON(result)
 
@@ -113,7 +113,7 @@ func TestPStringTypeReadJSONAllFields(t *testing.T) {
 		"encoding": "ascii"
 	}`
 
-	pstring := &PStringType{}
+	pstring := &PString{}
 	result := gjson.Parse(jsonStr)
 	err := pstring.ReadJSON(result)
 
@@ -156,7 +156,7 @@ func TestPStringTypeReadJSONInvalid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pstring := &PStringType{}
+			pstring := &PString{}
 			result := gjson.Parse(tt.jsonStr)
 			err := pstring.ReadJSON(result)
 
@@ -172,7 +172,7 @@ func TestGetTypePString(t *testing.T) {
 	jsonStr := `["pstring", {"countType": "varint"}]`
 
 	result := gjson.Parse(jsonStr)
-	typ := GetType("test_pstring", result)
+	typ := GetType(result)
 
 	if typ == nil {
 		t.Fatal("GetType() returned nil")
@@ -182,7 +182,7 @@ func TestGetTypePString(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "pstring")
 	}
 
-	pstring, ok := typ.Extras.(*PStringType)
+	pstring, ok := typ.Extras.(*PString)
 	if !ok {
 		t.Fatalf("typ.Extras is not *PStringType, got %T", typ.Extras)
 	}
@@ -210,7 +210,7 @@ func TestGetTypeFromJSONPString(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "pstring")
 	}
 
-	pstring, ok := typ.Extras.(*PStringType)
+	pstring, ok := typ.Extras.(*PString)
 	if !ok {
 		t.Fatalf("typ.Extras is not *PStringType")
 	}

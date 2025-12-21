@@ -11,7 +11,7 @@ func TestBufferTypeReadJSON(t *testing.T) {
 		"countType": "varint"
 	}`
 
-	buffer := &BufferType{}
+	buffer := &Buffer{}
 	result := gjson.Parse(jsonStr)
 	err := buffer.ReadJSON(result)
 
@@ -33,7 +33,7 @@ func TestBufferTypeReadJSONWithCount(t *testing.T) {
 		"count": 256
 	}`
 
-	buffer := &BufferType{}
+	buffer := &Buffer{}
 	result := gjson.Parse(jsonStr)
 	err := buffer.ReadJSON(result)
 
@@ -51,7 +51,7 @@ func TestBufferTypeReadJSONWithRest(t *testing.T) {
 		"rest": true
 	}`
 
-	buffer := &BufferType{}
+	buffer := &Buffer{}
 	result := gjson.Parse(jsonStr)
 	err := buffer.ReadJSON(result)
 
@@ -71,7 +71,7 @@ func TestBufferTypeReadJSONAllFields(t *testing.T) {
 		"rest": false
 	}`
 
-	buffer := &BufferType{}
+	buffer := &Buffer{}
 	result := gjson.Parse(jsonStr)
 	err := buffer.ReadJSON(result)
 
@@ -109,7 +109,7 @@ func TestBufferTypeReadJSONInvalid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			buffer := &BufferType{}
+			buffer := &Buffer{}
 			result := gjson.Parse(tt.jsonStr)
 			err := buffer.ReadJSON(result)
 
@@ -125,7 +125,7 @@ func TestGetTypeBuffer(t *testing.T) {
 	jsonStr := `["buffer", {"countType": "varint"}]`
 
 	result := gjson.Parse(jsonStr)
-	typ := GetType("test_buffer", result)
+	typ := GetType(result)
 
 	if typ == nil {
 		t.Fatal("GetType() returned nil")
@@ -135,7 +135,7 @@ func TestGetTypeBuffer(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "buffer")
 	}
 
-	buffer, ok := typ.Extras.(*BufferType)
+	buffer, ok := typ.Extras.(*Buffer)
 	if !ok {
 		t.Fatalf("typ.Extras is not *BufferType, got %T", typ.Extras)
 	}
@@ -163,7 +163,7 @@ func TestGetTypeFromJSONBuffer(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "buffer")
 	}
 
-	buffer, ok := typ.Extras.(*BufferType)
+	buffer, ok := typ.Extras.(*Buffer)
 	if !ok {
 		t.Fatalf("typ.Extras is not *BufferType")
 	}

@@ -17,7 +17,7 @@ func TestMapperTypeReadJSON(t *testing.T) {
 		}
 	}`
 
-	mapper := &MapperType{}
+	mapper := &Mapper{}
 	result := gjson.Parse(jsonStr)
 	err := mapper.ReadJSON(result)
 
@@ -69,7 +69,7 @@ func TestMapperTypeReadJSONInvalid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mapper := &MapperType{}
+			mapper := &Mapper{}
 			result := gjson.Parse(tt.jsonStr)
 			err := mapper.ReadJSON(result)
 
@@ -91,7 +91,7 @@ func TestMapperTypeWithComplexType(t *testing.T) {
 		}
 	}`
 
-	mapper := &MapperType{}
+	mapper := &Mapper{}
 	result := gjson.Parse(jsonStr)
 	err := mapper.ReadJSON(result)
 
@@ -122,7 +122,7 @@ func TestGetTypeMapper(t *testing.T) {
 	}]`
 
 	result := gjson.Parse(jsonStr)
-	typ := GetType("test_mapper", result)
+	typ := GetType(result)
 
 	if typ == nil {
 		t.Fatal("GetType() returned nil")
@@ -132,7 +132,7 @@ func TestGetTypeMapper(t *testing.T) {
 		t.Errorf("typ.TypeName = %q, want %q", typ.TypeName, "mapper")
 	}
 
-	mapper, ok := typ.Extras.(*MapperType)
+	mapper, ok := typ.Extras.(*Mapper)
 	if !ok {
 		t.Fatalf("typ.Extras is not *MapperType, got %T", typ.Extras)
 	}

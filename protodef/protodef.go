@@ -1,9 +1,10 @@
 package protodef
 
 import (
-	"errors"
 	"io"
 	"os"
+
+	"github.com/pkg/errors"
 
 	"github.com/protodef-go/protodef-go/protocol"
 	"github.com/tidwall/gjson"
