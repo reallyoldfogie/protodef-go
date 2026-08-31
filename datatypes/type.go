@@ -26,7 +26,7 @@ type Type struct {
 	Comment  string
 
 	Extras TypeExtras
-	
+
 	// RawDefinition contains the original protodef JSON snippet that defined this type.
 	// This is useful for debugging to see what the original definition was.
 	RawDefinition string
@@ -152,6 +152,10 @@ func GetType(d gjson.Result) *Type {
 					// t.Extras.ReadJSON(arr[1])
 				case "entityMetadataLoop":
 					t.Extras = &EntityMetadataLoop{}
+					// t.Extras.ReadJSON(arr[1])
+				case "topBitSetTerminatedArray", "topbitsetalternative":
+					// topBitSetTerminatedArray is an indexed array terminated by a byte with MSB set
+					t.Extras = &TopBitSetTerminatedArray{}
 					// t.Extras.ReadJSON(arr[1])
 				}
 			}
