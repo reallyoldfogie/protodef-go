@@ -23,7 +23,7 @@ func (ns *Namespace) ReadJSON(d gjson.Result) error {
 		}
 		if types.IsArray() {
 			for _, name := range types.Array() {
-				ns.Types = append(ns.Types, datatypes.GetType("", name))
+				ns.Types = append(ns.Types, datatypes.GetType(name))
 			}
 		}
 	}
