@@ -8,8 +8,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/protodef-go/protodef-go/datatypes"
-	"github.com/protodef-go/protodef-go/namespace"
+	"github.com/reallyoldfogie/protodef-go/datatypes"
+	"github.com/reallyoldfogie/protodef-go/namespace"
 	"github.com/tidwall/gjson"
 )
 

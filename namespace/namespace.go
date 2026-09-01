@@ -1,7 +1,7 @@
 package namespace
 
 import (
-	"github.com/protodef-go/protodef-go/datatypes"
+	"github.com/reallyoldfogie/protodef-go/datatypes"
 	"github.com/tidwall/gjson"
 )
 

@@ -1,4 +1,4 @@
-module github.com/protodef-go/protodef-go
+module github.com/reallyoldfogie/protodef-go
 
 go 1.22.5
 

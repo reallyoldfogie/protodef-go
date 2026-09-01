@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/protodef-go/protodef-go/protocol"
+	"github.com/reallyoldfogie/protodef-go/protocol"
 )
 
 func TestConditionalSchemaValidation(t *testing.T) {

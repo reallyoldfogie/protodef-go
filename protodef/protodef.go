@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/protodef-go/protodef-go/protocol"
+	"github.com/reallyoldfogie/protodef-go/protocol"
 	"github.com/tidwall/gjson"
 )
 

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/protodef-go/protodef-go/protocol"
+	"github.com/reallyoldfogie/protodef-go/protocol"
 	"github.com/tidwall/gjson"
 )
 
