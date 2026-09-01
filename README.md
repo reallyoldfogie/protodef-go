@@ -15,7 +15,7 @@ ProtoDef is a language-agnostic system for describing binary protocol structures
 
 ## Status
 
-**Current Version:** 0.9.0-alpha  
+**Current Version:** 0.9.0  
 **Spec Compliance:** ~85%
 
 ### Implementation Progress
