@@ -39,7 +39,7 @@ func GetTypeFromJSON(name string, option gjson.Result) *Type {
 
 	t := GetType(option)
 
-	fmt.Printf("DEBUG [GetTypeFromJSON]: got type %#v for %#v\n", t, option)
+	DebugPrintf("DEBUG [GetTypeFromJSON]: got type %#v for %#v\n", t, option)
 
 	if t != nil {
 		// Always create a copy to avoid mutating shared type objects
@@ -59,34 +59,34 @@ func GetTypeFromJSON(name string, option gjson.Result) *Type {
 		}
 		// DEBUG: Log successful type creation for simple string aliases
 		if option.Type == gjson.String && t.Name != t.TypeName {
-			fmt.Printf("DEBUG [GetTypeFromJSON %d]: Created simple type alias: '%s' -> '%s'\n", getGoroutineID(), t.Name, t.TypeName)
-			fmt.Printf("DEBUG [GetTypeFromJSON %d]: Created simple type alias: %#v (%p)\n", getGoroutineID(), t, t)
+			DebugPrintf("DEBUG [GetTypeFromJSON %d]: Created simple type alias: '%s' -> '%s'\n", getGoroutineID(), t.Name, t.TypeName)
+			DebugPrintf("DEBUG [GetTypeFromJSON %d]: Created simple type alias: %#v (%p)\n", getGoroutineID(), t, t)
 			if t.Name == "ContainerID" {
 				var buf [1500]byte
 				byteSize := runtime.Stack(buf[:], false)
-				fmt.Printf("%s\n\n", string(buf[:byteSize]))
+				DebugPrintf("%s\n\n", string(buf[:byteSize]))
 			}
 		}
 		return t
 	}
 
 	// DEBUG: Log when GetTypeFromJSON returns nil
-	fmt.Printf("DEBUG [GetTypeFromJSON]: Returning nil for name='%s', option.Type=%v, option.Raw='%s'\n",
+	DebugPrintf("DEBUG [GetTypeFromJSON]: Returning nil for name='%s', option.Type=%v, option.Raw='%s'\n",
 		name, option.Type, option.Raw)
 	return nil
 }
 
 func GetType(d gjson.Result) *Type {
-	fmt.Printf("DEBUG [GetType] %#v\n", d)
+	DebugPrintf("DEBUG [GetType] %#v\n", d)
 	var t *Type
 	if d.Type == gjson.String {
 		t = GetNativeType(d.String())
 		if t != nil {
-			fmt.Printf("DEBUG [GetType] returning native simple type %s -> %#v\n", d.String(), d)
+			DebugPrintf("DEBUG [GetType] returning native simple type %s -> %#v\n", d.String(), d)
 			return t
 		}
 
-		fmt.Printf("DEBUG [GetType] returning non-native simple type %s -> %#v\n", d.String(), d)
+		DebugPrintf("DEBUG [GetType] returning non-native simple type %s -> %#v\n", d.String(), d)
 
 		return &Type{
 			Name:          d.String(),

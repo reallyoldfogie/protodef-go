@@ -50,6 +50,12 @@ All ProtoDef specification types are implemented and parseable:
 **Extensions** (Non-Standard)
 - ✅ `varint64`, `varint128` - Extended variable-length integers
 - ✅ `zigzag32`, `zigzag64` - ZigZag-encoded signed integers
+- ✅ `bitflags` - Named boolean flags packed into an integer
+- ✅ `registryEntryHolder`, `registryEntryHolderSet` - Registry-conditional values
+- ✅ `entityMetadataLoop` - Loop that reads until a terminator value
+- ✅ `topBitSetTerminatedArray` (alias `topbitsetalternative`) - Slot array terminated by a high-bit-set byte
+
+These extensions are not part of the core ProtoDef spec; the last five are borrowed from Minecraft-protocol/`minecraft-data` definitions. See [Extensions](#extensions).
 
 #### ⚠️ In Progress
 - 🔨 Runtime encoding/decoding (planned)
@@ -66,27 +72,34 @@ go get github.com/protodef-go/protodef-go
 
 ```go
 import (
-    "github.com/protodef-go/protodef-go/datatypes"
-    "github.com/protodef-go/protodef-go/protocol"
+    "github.com/protodef-go/protodef-go/protodef"
 )
 
-// Parse a protocol definition
-proto, err := protocol.LoadFromFile("protocol.json")
+// Parse a protocol definition file
+proto, err := protodef.ReadProtocolFile("protocol.json")
 if err != nil {
     panic(err)
 }
 
-// Access type definitions
-packetType := proto.GetType("handshake_packet")
+// proto.Types holds every top-level type definition (*datatypes.Type)
+for _, t := range proto.Types {
+    fmt.Println(t.Name, t.TypeName)
+}
+
+// proto.Namespaces holds any nested namespace sections, keyed by name
+handshake := proto.Namespaces["handshake"]
 ```
 
 ## Documentation
 
 ### Core Documentation
 - [Implementation Fixes Plan](docs/implementation-fixes.md) - Detailed implementation roadmap
-- [Phase Summaries](docs/) - Phase 1-3 implementation summaries
-- [Extensions Guide](docs/extensions.md) - Non-standard type extensions
+- [Phase Summaries](docs/) - Phase 1-4 implementation summaries
+- [Extensions Guide](docs/extensions.md) - Non-standard numeric type extensions
+- [TypeExtras Implementation](docs/TYPEEXTRAS_IMPLEMENTATION.md) - How per-type argument parsing (`TypeExtras`) works
 - [RawDefinition Feature](docs/rawdefinition.md) - Debugging with original type definitions
+- [Implementation Verification](PROTODEF_IMPLEMENTATION_VERIFICATION.md) - Coverage check against the ProtoDef spec
+- [TODO](TODO.md) - Outstanding work tracked against the upstream spec
 
 ### ProtoDef Specification
 - [Official Spec](ProtoDef/README.md)
@@ -102,14 +115,17 @@ packetType := proto.GetType("handshake_packet")
 - Type composition and references
 - Little-endian type support
 - Anonymous container fields
-- Configurable integer sizes
-- Value mapping (mapper type)
+- Configurable integer sizes (`int`, `lint`)
+- Value mapping (`mapper` type)
+- Bit-level flags (`bitfield`, `bitflags`)
+- Registry-conditional types (`registryEntryHolder`, `registryEntryHolderSet`)
+- Terminator-based loops (`entityMetadataLoop`, `topBitSetTerminatedArray`)
+- JSON Schema validation of protocol definitions (`protocol.ValidateJSONSchema`, with optional `ajv-cli` support for advanced regex)
 - RawDefinition preservation for debugging
 
 ### 🔜 Planned
 - Runtime serialization/deserialization
 - Code generation from schemas
-- Validation utilities
 - Performance optimizations
 - More comprehensive examples
 
@@ -117,30 +133,42 @@ packetType := proto.GetType("handshake_packet")
 
 ```
 protodef-go/
-├── datatypes/          # Type definitions and parsing
-│   ├── primitives.go   # Basic types (bool, void, cstring)
-│   ├── numbers.go      # Numeric types (all variants)
-│   ├── container.go    # Container structures
-│   ├── array.go        # Array type
-│   ├── count.go        # Count type
-│   ├── switch.go       # Switch conditional
-│   ├── option.go       # Option type
-│   ├── buffer.go       # Buffer type
-│   ├── bitfield.go     # Bitfield type
-│   ├── mapper.go       # Mapper type
-│   ├── pstring.go      # Prefixed string type
-│   ├── type.go         # Core type system
-│   └── types.go        # Type registry
-├── protocol/           # Protocol parsing and validation
-├── namespace/          # Namespace management
-├── protodef/           # Core ProtoDef logic
-├── docs/               # Documentation
+├── datatypes/               # Type definitions and parsing
+│   ├── primitives.go        # Basic types (bool, void, cstring)
+│   ├── numbers.go           # Numeric types (all variants)
+│   ├── intExtras.go         # Configurable-size int/lint arguments
+│   ├── container.go         # Container structures (incl. anonymous fields)
+│   ├── array.go             # Array type
+│   ├── count.go             # Count type
+│   ├── switch.go            # Switch conditional
+│   ├── option.go            # Option type
+│   ├── conditional.go       # Conditional-type shared support
+│   ├── buffer.go            # Buffer type
+│   ├── bitfield.go          # Bitfield type
+│   ├── bitflags.go          # Bitflags type
+│   ├── mapper.go            # Mapper type
+│   ├── pstring.go           # Prefixed string type
+│   ├── registryEntryHolder.go     # Registry-conditional single value
+│   ├── registryEntryHolderSet.go  # Registry-conditional value set
+│   ├── entitymetadataloop.go      # Terminator-based read loop
+│   ├── topbitsetterminatedarray.go # High-bit-terminated slot array
+│   ├── type.go              # Core type system / JSON dispatch
+│   ├── typeExtras.go        # Per-type argument-parsing interface
+│   └── types.go             # Native type registry
+├── protocol/                 # Protocol parsing and JSON Schema validation
+├── namespace/                # Namespace management
+├── protodef/                 # Top-level file-loading API (ReadProtocolFile)
+├── examples/                 # Example programs (e.g. rawdefinition_example.go)
+├── docs/                     # Documentation
 │   ├── implementation-fixes.md
 │   ├── extensions.md
+│   ├── rawdefinition.md
+│   ├── TYPEEXTRAS_IMPLEMENTATION.md
 │   ├── phase1-summary.md
 │   ├── phase2-summary.md
-│   └── phase3-summary.md
-└── ProtoDef/           # Official spec (submodule/reference)
+│   ├── phase3-summary.md
+│   └── phase4-summary.md
+└── ProtoDef/                 # Official spec (git submodule)
 ```
 
 ## Examples
@@ -217,7 +245,9 @@ This implementation aims for compatibility with:
 
 ### Extensions
 
-Some types (`varint64`, `varint128`, `zigzag32`, `zigzag64`) are non-standard extensions. See [docs/extensions.md](docs/extensions.md) for details.
+Some types are non-standard extensions to the core ProtoDef spec:
+- Numeric extensions `varint64`, `varint128`, `zigzag32`, `zigzag64` — documented in [docs/extensions.md](docs/extensions.md)
+- Minecraft-protocol-derived types `bitflags`, `registryEntryHolder`, `registryEntryHolderSet`, `entityMetadataLoop`, `topBitSetTerminatedArray` (alias `topbitsetalternative`) — implemented for compatibility with `minecraft-data`/`node-minecraft-protocol` protocol definitions, not part of the official ProtoDef spec
 
 ## Testing
 
@@ -248,12 +278,14 @@ See [docs/implementation-fixes.md](docs/implementation-fixes.md) for the detaile
 
 | Category | Types | Status |
 |----------|-------|--------|
-| Numeric | 17 types | ✅ 100% |
+| Numeric (incl. `int`/`lint`) | 23 types | ✅ 100% |
 | Primitives | 3 types | ✅ 100% |
 | Structures | 3 types | ✅ 100% |
 | Conditional | 2 types | ✅ 100% |
 | Utils | 4 types | ✅ 100% |
-| **Total** | **29 types** | **✅ 100%** |
+| **ProtoDef spec subtotal** | **35 types** | **✅ 100%** |
+| Non-standard extensions | 9 types | ✅ 100% |
+| **Total** | **44 types** | **✅ 100%** |
 
 ## Projects Using ProtoDef
 
@@ -264,7 +296,7 @@ ProtoDef is used by various projects for protocol definitions:
 
 ## License
 
-[Specify your license here]
+MIT - see [LICENSE](LICENSE)
 
 ## Acknowledgments
 

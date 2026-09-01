@@ -73,6 +73,36 @@ All structs that are assigned to `Type.Extras` have been updated to implement th
   - `Clone`: Returns new IntExtras with same values
   - `UpdateContainedNames`: No-op (no field references)
 
+### 11. Bitflags (`datatypes/bitflags.go`)
+- **Fields**: `name string`, `Type *Type`, `Flags []string`
+- **SetName/GetName**: Store and retrieve bitflags name
+- **Clone**: Deep clone of Type (with recursive Extras cloning) and the Flags slice
+- **UpdateContainedNames**: Recursively updates names in Type
+
+### 12. RegistryEntryHolder (`datatypes/registryEntryHolder.go`)
+- **Fields**: `name string`, `Type *Type`, `BaseName string`, `Otherwise RegistryEntryOthewise`
+- **SetName/GetName**: Store and retrieve registryEntryHolder name
+- **Clone**: Deep clone of the `Otherwise` field's Type with recursive Extras cloning
+- **UpdateContainedNames**: Recursively updates names in the `Otherwise` field's Type
+
+### 13. RegistryEntryHolderSet (`datatypes/registryEntryHolderSet.go`)
+- **Fields**: `name string`, `Type *Type`, `Base` and `Otherwise` field definitions
+- **SetName/GetName**: Store and retrieve registryEntryHolderSet name
+- **Clone**: Deep clone of the `Base`/`Otherwise` field types with recursive Extras cloning
+- **UpdateContainedNames**: Recursively updates names in the `Base`/`Otherwise` field types
+
+### 14. EntityMetadataLoop (`datatypes/entitymetadataloop.go`)
+- **Fields**: `name string`, `Type *Type`, `EndVal int`
+- **SetName/GetName**: Store and retrieve entityMetadataLoop name
+- **Clone**: Deep clone of Type with recursive Extras cloning
+- **UpdateContainedNames**: Recursively updates names in Type
+
+### 15. TopBitSetTerminatedArray (`datatypes/topbitsetterminatedarray.go`)
+- **Fields**: `name string`, `Type *Type`
+- **SetName/GetName**: Store and retrieve topBitSetTerminatedArray name
+- **Clone**: Deep clone of Type with recursive Extras cloning
+- **UpdateContainedNames**: Recursively updates names in Type
+
 ## Key Implementation Details
 
 ### Deep Recursion in Clone
@@ -126,7 +156,7 @@ if ie, ok := got.Extras.(*IntExtras); !ok || ie.Size != tt.size {
 ```
 
 ## Testing
-All 195+ datatypes tests pass successfully, including:
+All datatypes tests pass successfully (77 test cases in `datatypes`, 110 across the whole repo as of this writing — run `go test -v ./... | grep -c '^--- PASS'` for the current count), including:
 - Type reading and parsing
 - JSON deserialization
 - Schema validation

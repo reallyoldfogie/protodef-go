@@ -52,7 +52,7 @@ func (cf *Container) ReadJSON(d gjson.Result) error {
 			if field.Type != nil {
 				typeInfo = fmt.Sprintf("%s (typename=%s)", field.Type.Name, field.Type.TypeName)
 			}
-			fmt.Printf("DEBUG [container.ReadJSON]: Container '%s' parsed field '%s' Type=%s Anon=%v\n", 
+			DebugPrintf("DEBUG [container.ReadJSON]: Container '%s' parsed field '%s' Type=%s Anon=%v\n",
 				cf.Name, field.Name, typeInfo, field.Anon)
 		}
 

@@ -1,11 +1,15 @@
 # ProtoDef-Go Extensions
 
 **Status:** Documented  
-**Version:** 1.0
+**Version:** 1.1
 
 ## Overview
 
 This document describes the non-standard type extensions implemented in protodef-go that are not part of the official ProtoDef specification. These extensions provide additional functionality for specific use cases but may not be compatible with other ProtoDef implementations.
+
+There are two groups of extensions:
+- **Numeric extensions** (`varint64`, `varint128`, `zigzag32`, `zigzag64`) — alternative integer encodings, covered in detail below.
+- **Structural extensions** (`bitflags`, `registryEntryHolder`, `registryEntryHolderSet`, `entityMetadataLoop`, `topBitSetTerminatedArray`) — types borrowed from Minecraft-protocol/`minecraft-data` protocol definitions, covered in their own section below.
 
 ## Purpose
 
@@ -13,6 +17,7 @@ Extensions are provided to support:
 - Advanced variable-length integer encoding schemes
 - Optimized integer representations for specific protocols
 - Protocol-specific requirements not covered by the base spec
+- Compatibility with real-world Minecraft-protocol/`minecraft-data` definitions that use structures beyond the core ProtoDef spec
 
 ## ⚠️ Compatibility Warning
 
@@ -190,6 +195,108 @@ ZigZag encoding combined with varint for efficient representation of signed inte
 
 ---
 
+## Structural Extensions (Minecraft-Protocol-Derived)
+
+Unlike the numeric extensions above, these types aren't alternative integer encodings — they're structural/utility types borrowed from Minecraft-protocol (`minecraft-data`) protocol definitions so that real-world Minecraft protocol JSON can be parsed as-is. They are implemented in `datatypes/bitflags.go`, `datatypes/registryEntryHolder.go`, `datatypes/registryEntryHolderSet.go`, `datatypes/entitymetadataloop.go`, and `datatypes/topbitsetterminatedarray.go`.
+
+### 5. `bitflags` - Named Boolean Flags
+
+**Category:** Utility (Non-Standard)
+
+#### Description
+Represents a set of boolean flags packed into an integer type, with each flag addressed by name rather than bit position.
+
+#### Arguments
+- `type`: the underlying integer type (`u8`, `u16`, `u32`, `u64`, `i8`, `i16`, `i32`, `i64`)
+- `flags`: array of flag names, each occupying one bit
+
+#### Example
+```json
+["bitflags", {
+  "type": "u32",
+  "flags": ["x", "y", "z", "yaw", "pitch"]
+}]
+```
+
+---
+
+### 6. `registryEntryHolder` - Single Registry-Conditional Value
+
+**Category:** Structure (Non-Standard)
+
+#### Description
+Reads a single value whose type is resolved against a registry entry looked up by a preceding field (`baseName`), falling back to a fixed type (`otherwise`) when no registry-specific type applies.
+
+#### Arguments
+- `baseName`: the name of the field holding the registry key
+- `otherwise`: `{name, type}` fallback field definition
+
+#### Example
+```json
+["registryEntryHolder", {
+  "baseName": "patternId",
+  "otherwise": {"name": "data", "type": "BannerPattern"}
+}]
+```
+
+---
+
+### 7. `registryEntryHolderSet` - Registry-Conditional Value Set
+
+**Category:** Structure (Non-Standard)
+
+#### Description
+Like `registryEntryHolder`, but for a set of values rather than a single one: a `base` field defines what's read to identify the set, and `otherwise` defines the fallback field when no registry-specific handling applies.
+
+#### Arguments
+- `base`: `{name, type}` field definition for the set identifier
+- `otherwise`: `{name, type}` fallback field definition
+
+#### Example
+```json
+["registryEntryHolderSet", {
+  "base": {"name": "name", "type": "string"},
+  "otherwise": {"name": "ids", "type": "varint"}
+}]
+```
+
+---
+
+### 8. `entityMetadataLoop` - Terminator-Based Read Loop
+
+**Category:** Structure (Non-Standard)
+
+#### Description
+Reads entries of a given type repeatedly until a terminator value (`endVal`) is encountered. Used for Minecraft's entity metadata, which is a run of typed entries terminated by a sentinel byte (typically `0xFF`).
+
+#### Arguments
+- `type`: the type of each loop entry
+- `endVal`: the terminator value that signals the end of the loop
+
+#### Example
+```json
+["entityMetadataLoop", {"endVal": 255, "type": "entityMetadataEntry"}]
+```
+
+---
+
+### 9. `topBitSetTerminatedArray` (alias `topbitsetalternative`) - High-Bit-Terminated Slot Array
+
+**Category:** Structure (Non-Standard)
+
+#### Description
+An array-like structure where entries are indexed by 7-bit slot indices and the array is terminated by a byte with the MSB (high bit) set. Used for Minecraft's equipment/slot update packets.
+
+#### Arguments
+- `type`: the type of each array element (typically a container combining a slot index and its data)
+
+#### Example
+```json
+["topBitSetTerminatedArray", {"type": ["container", ["..."]]}]
+```
+
+---
+
 ## Comparison Matrix
 
 | Type | Signed | Size Range | Best Use Case | Standard |
@@ -199,6 +306,8 @@ ZigZag encoding combined with varint for efficient representation of signed inte
 | `varint128` | No | 1-19 bytes | 128-bit values | ❌ Extension |
 | `zigzag32` | Yes | 1-5 bytes | Signed 32-bit near zero | ❌ Extension |
 | `zigzag64` | Yes | 1-10 bytes | Signed 64-bit near zero | ❌ Extension |
+
+*(This matrix covers only the numeric extensions; the structural extensions above aren't alternative integer encodings, so a byte-size comparison doesn't apply to them.)*
 
 ---
 
@@ -254,6 +363,8 @@ If you need to migrate from extensions to standard types:
 | `zigzag32` | `i32` | Fixed 4 bytes, no space optimization |
 | `zigzag64` | `i64` | Fixed 8 bytes, no space optimization |
 
+There's no standard-ProtoDef equivalent for the structural extensions (`bitflags`, `registryEntryHolder(Set)`, `entityMetadataLoop`, `topBitSetTerminatedArray`) — they exist specifically to parse Minecraft-protocol definitions that assume these shapes.
+
 ---
 
 ## Implementation Status
@@ -266,6 +377,11 @@ If you need to migrate from extensions to standard types:
 | `varint128` | ✅ | ✅ | ⚠️ Pending | ⚠️ Pending |
 | `zigzag32` | ✅ | ✅ | ⚠️ Pending | ⚠️ Pending |
 | `zigzag64` | ✅ | ✅ | ⚠️ Pending | ⚠️ Pending |
+| `bitflags` | ✅ | ✅ | ⚠️ Pending | ⚠️ Pending |
+| `registryEntryHolder` | ✅ | ✅ | ⚠️ Pending | ⚠️ Pending |
+| `registryEntryHolderSet` | ✅ | ✅ | ⚠️ Pending | ⚠️ Pending |
+| `entityMetadataLoop` | ✅ | ✅ | ⚠️ Pending | ⚠️ Pending |
+| `topBitSetTerminatedArray` | ✅ | ✅ | ⚠️ Pending | ⚠️ Pending |
 
 **Note:** Type definitions and parsing are complete. Runtime encoding/decoding will be implemented in future releases.
 
@@ -342,6 +458,9 @@ If you have ideas for additional extensions or improvements to existing ones:
 ---
 
 ## Version History
+
+### Version 1.1
+- Documented the structural extensions: `bitflags`, `registryEntryHolder`, `registryEntryHolderSet`, `entityMetadataLoop`, `topBitSetTerminatedArray` (alias `topbitsetalternative`)
 
 ### Version 1.0 (2025-10-31)
 - Initial documentation of varint64, varint128, zigzag32, zigzag64

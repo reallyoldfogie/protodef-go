@@ -1,7 +1,6 @@
 package datatypes
 
 import (
-	"fmt"
 	"github.com/tidwall/gjson"
 )
 
@@ -23,7 +22,7 @@ func (s *Switch) ReadJSON(d gjson.Result) error {
 	}
 	
 	// DEBUG: Log switch compareTo field
-	fmt.Printf("DEBUG [switch.ReadJSON]: Switch '%s' has compareTo='%s'\n", s.name, s.CompareTo)
+	DebugPrintf("DEBUG [switch.ReadJSON]: Switch '%s' has compareTo='%s'\n", s.name, s.CompareTo)
 	
 	s.Fields = make(map[string]*Type)
 	fields := d.Get("fields")

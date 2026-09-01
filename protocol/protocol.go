@@ -40,7 +40,7 @@ func (p *Protocol) ReadJSON(d gjson.Result) error {
 		return errors.New("protocol type is not object")
 	}
 
-	fmt.Println("DEBUG [Protocol.ReadJSON - START]: p.Types slice ptr=", &p.Types, "cap=", cap(p.Types), "len=", len(p.Types))
+	datatypes.DebugPrintln("DEBUG [Protocol.ReadJSON - START]: p.Types slice ptr=", &p.Types, "cap=", cap(p.Types), "len=", len(p.Types))
 
 	typeCount := 0
 	for name, option := range types.Map() {
@@ -48,28 +48,28 @@ func (p *Protocol) ReadJSON(d gjson.Result) error {
 		if t == nil {
 			// DEBUG
 			if name == "ContainerID" || name == "optvarint" {
-				fmt.Printf("DEBUG [Protocol.ReadJSON %d]: GetTypeFromJSON returned nil for %s\n", getGoroutineID(), name)
+				datatypes.DebugPrintf("DEBUG [Protocol.ReadJSON %d]: GetTypeFromJSON returned nil for %s\n", getGoroutineID(), name)
 			}
 			continue
 		}
 		// DEBUG
 		if name == "ContainerID" || name == "optvarint" {
-			fmt.Printf("DEBUG [Protocol.ReadJSON %d]: Adding type to p.Types: %s TypeName= %s current len=%d\n", getGoroutineID(), name, t.TypeName, len(p.Types))
+			datatypes.DebugPrintf("DEBUG [Protocol.ReadJSON %d]: Adding type to p.Types: %s TypeName= %s current len=%d\n", getGoroutineID(), name, t.TypeName, len(p.Types))
 		}
 		p.Types = append(p.Types, t)
 		typeCount++
 		if name == "ContainerID" || name == "optvarint" {
-			fmt.Printf("DEBUG [Protocol.ReadJSON %d]: After append, p.Types len=%d\n", getGoroutineID(), len(p.Types))
+			datatypes.DebugPrintf("DEBUG [Protocol.ReadJSON %d]: After append, p.Types len=%d\n", getGoroutineID(), len(p.Types))
 		}
 
-		fmt.Printf("DEBUG [Protocol.ReadJSON %d]: t=%#v (%p)\n", getGoroutineID(), t, t)
-		fmt.Printf("DEBUG [Protocol.ReadJSON %d]: After append => %#v\n", getGoroutineID(), p.Types)
+		datatypes.DebugPrintf("DEBUG [Protocol.ReadJSON %d]: t=%#v (%p)\n", getGoroutineID(), t, t)
+		datatypes.DebugPrintf("DEBUG [Protocol.ReadJSON %d]: After append => %#v\n", getGoroutineID(), p.Types)
 	}
-	println("DEBUG [Protocol.ReadJSON]: Added", typeCount, "types from top-level .types section. Total p.Types length=", len(p.Types))
+	datatypes.DebugPrintln("DEBUG [Protocol.ReadJSON]: Added", typeCount, "types from top-level .types section. Total p.Types length=", len(p.Types))
 	// DEBUG: Print all type names
-	println("DEBUG: [Protocol.ReadJSON]All types in p.Types :")
+	datatypes.DebugPrintln("DEBUG: [Protocol.ReadJSON]All types in p.Types :")
 	for i, t := range p.Types {
-		fmt.Printf("\tDEBUG: [Protocol.ReadJSON %d] [%d] %#v (%p)\n", getGoroutineID(), i, t, t)
+		datatypes.DebugPrintf("\tDEBUG: [Protocol.ReadJSON %d] [%d] %#v (%p)\n", getGoroutineID(), i, t, t)
 	}
 
 	// DEBUG: Check if ContainerID exists BEFORE namespace processing
@@ -77,12 +77,12 @@ func (p *Protocol) ReadJSON(d gjson.Result) error {
 	for _, t := range p.Types {
 		if t.Name == "ContainerID" {
 			hasContainerIDBefore = true
-			println("DEBUG [BEFORE namespace loop]: ContainerID exists at index")
+			datatypes.DebugPrintln("DEBUG [BEFORE namespace loop]: ContainerID exists at index")
 			break
 		}
 	}
 	if !hasContainerIDBefore {
-		println("DEBUG [BEFORE namespace loop]: ContainerID DOES NOT exist")
+		datatypes.DebugPrintln("DEBUG [BEFORE namespace loop]: ContainerID DOES NOT exist")
 	}
 
 	p.Namespaces = make(map[string]*namespace.Namespace)
@@ -100,7 +100,7 @@ func (p *Protocol) ReadJSON(d gjson.Result) error {
 		p.Namespaces[name] = namespace
 	}
 
-	println("DEBUG [Protocol.ReadJSON - END]: Final p.Types length=", len(p.Types))
+	datatypes.DebugPrintln("DEBUG [Protocol.ReadJSON - END]: Final p.Types length=", len(p.Types))
 	// DEBUG: Check if ContainerID is still there
 	hasContainerID := false
 	for _, t := range p.Types {
@@ -110,9 +110,9 @@ func (p *Protocol) ReadJSON(d gjson.Result) error {
 		}
 	}
 	if hasContainerID {
-		println("DEBUG [Protocol.ReadJSON - END]: ContainerID IS in p.Types")
+		datatypes.DebugPrintln("DEBUG [Protocol.ReadJSON - END]: ContainerID IS in p.Types")
 	} else {
-		println("DEBUG [Protocol.ReadJSON - END]: ContainerID IS NOT in p.Types")
+		datatypes.DebugPrintln("DEBUG [Protocol.ReadJSON - END]: ContainerID IS NOT in p.Types")
 	}
 	return nil
 }
